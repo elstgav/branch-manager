@@ -1,7 +1,7 @@
 # Updates a branch and returns you to your workspace
 function update_branch {
   [[ -z "$1" ]] && other_branch=$(git rev-parse --abbrev-ref HEAD) || other_branch=$1
-  current_branch=$(git rev-parse --abbrev-ref HEAD)
+  current_branch=$(git symbolic-ref --short HEAD)
   stashed_changes=$(git stash)
   git checkout $other_branch
   git pull
