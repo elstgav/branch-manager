@@ -11,8 +11,16 @@ function update_branch {
   # disable post-commit hook temporarily
   [ -x $hook ] && chmod -x $hook
 
+  # Update the requested branch
   git checkout $other_branch
   git pull
+
+  # If we updated the current branch, then we should run post-commit hooks
+  if [[ $other_branch == $current_branch ]]; then
+    chmod +x $hook
+  fi
+
+  # Return to current branch
   git checkout $current_branch
 
   # Re-enable hook
