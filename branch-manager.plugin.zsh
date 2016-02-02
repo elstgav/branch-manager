@@ -42,16 +42,39 @@ function update_branch {
 
 # Merges a branch into your own while preserving your workspace
 function merge_branch {
+  current_branch=$(git symbolic-ref --short HEAD)
+  stashed_changes=$(git stash)
+  gitdir="$(git rev-parse --git-dir)"
+  hook="$gitdir/hooks/post-checkout"
+
+  # Merge from master if no argument given
   [[ -z "$1" ]] && other_branch="master" || other_branch=$1
-  branch=$(git rev-parse --abbrev-ref HEAD)
-  stashy=$(git stash)
+
+  # disable post-checkout hook temporarily
+  [ -x $hook ] && chmod -x $hook
+
+  # Update the requested branch
+  echo "Updating $other_branch…\n"
   git checkout $other_branch
   git pull
-  git checkout $branch
+
+  # Return to current branch
+  git checkout $current_branch
+
+  # Re-enable hook
+  chmod +x $hook
+
+  # Merge changes
   git merge $other_branch --no-edit
-  if [ "$stashy" != "No local changes to save" ]; then
+
+  # Reset working directory
+  if [ "$stashed_changes" != "No local changes to save" ]; then
     git stash pop
   else
     echo "No stash to pop"
   fi
+
+  echo "$fg[green]"
+  echo "✓ Succesfully merged $other_branch into $current_branch"
+  echo "$reset_color"
 }
