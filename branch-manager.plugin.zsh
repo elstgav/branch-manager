@@ -12,6 +12,7 @@ function update_branch {
   [ -x $hook ] && chmod -x $hook
 
   # Update the requested branch
+  echo "Updating $other_branch…\n"
   git checkout $other_branch
   git pull
 
@@ -32,6 +33,10 @@ function update_branch {
   else
     echo "No stash to pop"
   fi
+
+  echo "$fg[green]"
+  echo "✓ Succesfully updated $other_branch"
+  echo "$reset_color"
 }
 
 
