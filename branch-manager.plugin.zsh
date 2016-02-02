@@ -8,7 +8,7 @@ function update_branch {
   # Update the current branch if no argument given
   [[ -z "$1" ]] && other_branch=$current_branch || other_branch=$1
 
-  # disable post-commit hook temporarily
+  # disable post-checkout hook temporarily
   [ -x $hook ] && chmod -x $hook
 
   # Update the requested branch
@@ -16,7 +16,7 @@ function update_branch {
   git checkout $other_branch
   git pull
 
-  # If we updated the current branch, then we should run post-commit hooks
+  # If we updated the current branch, then we should run post-checkout hook
   if [[ $other_branch == $current_branch ]]; then
     chmod +x $hook
   fi
