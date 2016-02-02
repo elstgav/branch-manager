@@ -1,10 +1,12 @@
 # Updates a branch and returns you to your workspace
 function update_branch {
-  [[ -z "$1" ]] && other_branch=$(git rev-parse --abbrev-ref HEAD) || other_branch=$1
   current_branch=$(git symbolic-ref --short HEAD)
   stashed_changes=$(git stash)
   gitdir="$(git rev-parse --git-dir)"
   hook="$gitdir/hooks/post-checkout"
+
+  # Update the current branch if no argument given
+  [[ -z "$1" ]] && other_branch=$current_branch || other_branch=$1
 
   # disable post-commit hook temporarily
   [ -x $hook ] && chmod -x $hook
