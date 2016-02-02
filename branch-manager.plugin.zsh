@@ -3,9 +3,18 @@ function update_branch {
   [[ -z "$1" ]] && other_branch=$(git rev-parse --abbrev-ref HEAD) || other_branch=$1
   current_branch=$(git symbolic-ref --short HEAD)
   stashed_changes=$(git stash)
+  gitdir="$(git rev-parse --git-dir)"
+  hook="$gitdir/hooks/post-checkout"
+
+  # disable post-commit hook temporarily
+  [ -x $hook ] && chmod -x $hook
+
   git checkout $other_branch
   git pull
   git checkout $current_branch
+
+  # Re-enable hook
+  chmod +x $hook
 
   # Reset working directory
   if [ "$stashed_changes" != "No local changes to save" ]; then
