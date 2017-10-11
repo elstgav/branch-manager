@@ -78,3 +78,41 @@ function merge_branch {
   echo "✓ Succesfully merged $other_branch into $current_branch"
   echo "$reset_color"
 }
+
+function rebase_branch {
+  current_branch=$(git symbolic-ref --short HEAD)
+  stashed_changes=$(git stash)
+  gitdir="$(git rev-parse --git-dir)"
+  hook="$gitdir/hooks/post-checkout"
+
+  # Rebase from master if no argument given
+  [[ -z "$1" ]] && other_branch="master" || other_branch=$1
+
+  # disable post-checkout hook temporarily
+  [ -x $hook ] && chmod -x $hook
+
+  # Update the requested branch
+  echo "Updating $other_branch…\n"
+  git checkout $other_branch
+  git pull
+
+  # Return to current branch
+  git checkout $current_branch
+
+  # Re-enable hook
+  chmod +x $hook
+
+  # Merge changes
+  git rebase $other_branch
+
+  # Reset working directory
+  if [ "$stashed_changes" != "No local changes to save" ]; then
+    git stash pop
+  else
+    echo "No stash to pop"
+  fi
+
+  echo "$fg[green]"
+  echo "✓ Succesfully rebased $current_branch onto $other_branch"
+  echo "$reset_color"
+}
