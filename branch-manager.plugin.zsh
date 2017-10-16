@@ -79,6 +79,7 @@ function merge_branch {
   echo "$reset_color"
 }
 
+# Rebases a branch into your own while preserving your workspace
 function rebase_branch {
   current_branch=$(git symbolic-ref --short HEAD)
   stashed_changes=$(git stash)
