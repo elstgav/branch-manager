@@ -1,4 +1,4 @@
-# branch-manager
+# branch-manager [![GitHub tag](https://img.shields.io/github/tag/elstgav/branch-manager.svg)]()
 oh-my-zsh plugin for managing branches
 
 Adds the `update_branch` and `merge_branch` commands to your shell. Both of these will let you update or merge changes while preserving your current workspace.
@@ -18,6 +18,10 @@ Adds the `update_branch` and `merge_branch` commands to your shell. Both of thes
 
 
 ## Changelog
+
+#### 1.1.1 October 16, 2017
+
+- Fix warning messages if post-checkout hook doesn’t exist (#2)
 
 #### 1.1 October 16, 2017
 
