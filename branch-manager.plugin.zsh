@@ -17,7 +17,7 @@ function update_branch {
   git pull
 
   # If we updated the current branch, then we should run post-checkout hook
-  if [[ $other_branch == $current_branch ]]; then
+  if [[ -e $hook && $other_branch == $current_branch ]]; then
     chmod +x $hook
   fi
 
@@ -25,7 +25,7 @@ function update_branch {
   git checkout $current_branch
 
   # Re-enable hook
-  chmod +x $hook
+  [ -e $hook ] && chmod +x $hook
 
   # Reset working directory
   if [ "$stashed_changes" != "No local changes to save" ]; then
@@ -62,7 +62,7 @@ function merge_branch {
   git checkout $current_branch
 
   # Re-enable hook
-  chmod +x $hook
+  [ -e $hook ] && chmod +x $hook
 
   # Merge changes
   git merge $other_branch --no-edit
@@ -101,7 +101,7 @@ function rebase_branch {
   git checkout $current_branch
 
   # Re-enable hook
-  chmod +x $hook
+  [ -e $hook ] && chmod +x $hook
 
   # Merge changes
   git rebase $other_branch
