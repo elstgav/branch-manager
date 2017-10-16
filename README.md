@@ -15,3 +15,12 @@ Adds the `update_branch` and `merge_branch` commands to your shell. Both of thes
   ```bash 
   plugins(rails git branch-manager)
   ```
+
+
+## Changelog
+
+1.1 October 16, 2017
+
+- Added a rebase_branch command (Thanks @blimmer!)
+
+1.0 February 2, 2016
