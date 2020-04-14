@@ -1,8 +1,20 @@
 # branch-manager [![GitHub tag](https://img.shields.io/github/tag/elstgav/branch-manager.svg)]()
 oh-my-zsh plugin for managing branches
 
-Adds the `update_branch` and `merge_branch` commands to your shell. Both of these will let you update or merge changes while preserving your current workspace.
+Updating branches can be a pain, especially if you have unsaved changes in your workspace. `branch-manager` makes it easier to perform updates by auto-stashing your changes before doing routine maintenance, and then returning you to your workspace.
 
+## Usage
+
+`branch-manager` adds the following commands to your shell:
+
+ - `update_branch [branch=current_branch]`  
+   Pull `branch` and return to your workspace
+    
+ - `merge_branch [other_branch=master]`  
+   Merge `other_branch` into your own
+   
+ - `rebase_branch [other_branch=master]`  
+   Rebase `other_branch` into your own
 
 ## Installation
 
@@ -18,6 +30,11 @@ Adds the `update_branch` and `merge_branch` commands to your shell. Both of thes
 
 
 ## Changelog
+
+#### 1.2 April 14, 2020
+
+- Auto-stashing now includes untracked files
+- Removes “no stash” feedback to reduce noise
 
 #### 1.1.1 October 16, 2017
 
