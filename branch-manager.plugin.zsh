@@ -30,8 +30,6 @@ function update_branch {
   # Reset working directory
   if [ "$stashed_changes" != "No local changes to save" ]; then
     git stash pop
-  else
-    echo "No stash to pop"
   fi
 
   echo "$fg[green]"
@@ -70,8 +68,6 @@ function merge_branch {
   # Reset working directory
   if [ "$stashed_changes" != "No local changes to save" ]; then
     git stash pop
-  else
-    echo "No stash to pop"
   fi
 
   echo "$fg[green]"
@@ -109,8 +105,6 @@ function rebase_branch {
   # Reset working directory
   if [ "$stashed_changes" != "No local changes to save" ]; then
     git stash pop
-  else
-    echo "No stash to pop"
   fi
 
   echo "$fg[green]"
