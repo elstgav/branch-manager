@@ -12,7 +12,10 @@ function update_branch {
   [ -x $hook ] && mv $hook "$hook-disabled"
 
   # Update the requested branch
-  echo "Updating $other_branch…\n"
+  echo -n "$fg[blue]"
+  echo "Updating $other_branch…"
+  echo "$reset_color"
+
   git checkout $other_branch
   git pull
 
@@ -29,6 +32,9 @@ function update_branch {
 
   # Reset working directory
   if [ "$stashed_changes" != "No local changes to save" ]; then
+    echo "$fg[blue]"
+    echo "Restoring stashed changes…"
+    echo "$reset_color"
     git stash pop
   fi
 
@@ -52,7 +58,10 @@ function merge_branch {
   [ -x $hook ] && mv $hook "$hook-disabled"
 
   # Update the requested branch
-  echo "Updating $other_branch…\n"
+  echo -n "$fg[blue]"
+  echo "Updating $other_branch…"
+  echo "$reset_color"
+
   git checkout $other_branch
   git pull
 
@@ -63,10 +72,16 @@ function merge_branch {
   [ -e "$hook-disabled" ] && mv "$hook-disabled" $hook
 
   # Merge changes
+  echo "$fg[blue]"
+  echo "Merging $other_branch…"
+  echo "$reset_color"
   git merge $other_branch --no-edit
 
   # Reset working directory
   if [ "$stashed_changes" != "No local changes to save" ]; then
+    echo "$fg[blue]"
+    echo "Restoring stashed changes…"
+    echo "$reset_color"
     git stash pop
   fi
 
@@ -89,7 +104,10 @@ function rebase_branch {
   [ -x $hook ] && mv $hook "$hook-disabled"
 
   # Update the requested branch
-  echo "Updating $other_branch…\n"
+  echo -n "$fg[blue]"
+  echo "Updating $other_branch…"
+  echo "$reset_color"
+
   git checkout $other_branch
   git pull
 
@@ -99,11 +117,18 @@ function rebase_branch {
   # Re-enable hook
   [ -e "$hook-disabled" ] && mv "$hook-disabled" $hook
 
-  # Merge changes
+  # Rebase changes
+  echo "$fg[blue]"
+  echo "Rebasing off $other_branch…"
+  echo "$reset_color"
+
   git rebase $other_branch
 
   # Reset working directory
   if [ "$stashed_changes" != "No local changes to save" ]; then
+    echo "$fg[blue]"
+    echo "Restoring stashed changes…"
+    echo "$reset_color"
     git stash pop
   fi
 

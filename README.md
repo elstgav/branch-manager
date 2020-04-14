@@ -31,6 +31,11 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 
 ## Changelog
 
+#### 1.2.1 April 14, 2020
+
+- Colorize status messages
+- Print message when restoring stashed changes
+
 #### 1.2 April 14, 2020
 
 - Auto-stashing now includes untracked files
