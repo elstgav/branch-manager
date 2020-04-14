@@ -1,4 +1,4 @@
-# branch-manager [![GitHub tag](https://img.shields.io/github/tag/elstgav/branch-manager.svg)](#changelog)
+# branch-manager [![GitHub tag](https://img.shields.io/github/v/tag/elstgav/branch-manager?label=version&sort=semver)](#changelog)
 oh-my-zsh plugin for managing branches
 
 Updating branches can be a pain, especially if you have unsaved changes in your workspace. `branch-manager` makes it easier to perform updates by auto-stashing your changes before doing routine maintenance, and then returning you to your workspace.
