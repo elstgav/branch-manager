@@ -16,6 +16,10 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
  - `rebase_branch [other_branch=master]`  
    Rebase `other_branch` into your own
 
+ - `pull_and_prune [branch=master]`  
+   Pull `branch` and delete all dead/merged branches.  
+   Useful for staying up-to-date with an active remote, while keeping your local repo tidy.
+
 ## Installation
 
 `branch-manager` is built to work with [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh/), so you’ll need that installed first.
@@ -30,6 +34,10 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 
 
 ## Changelog
+
+#### [Unreleased]
+
+- Add `pull_and_prune` command
 
 #### 1.2.1 April 14, 2020
 
