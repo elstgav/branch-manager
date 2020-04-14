@@ -1,7 +1,7 @@
 # Updates a branch and returns you to your workspace
 function update_branch {
   current_branch=$(git symbolic-ref --short HEAD)
-  stashed_changes=$(git stash)
+  stashed_changes=$(git stash -u)
   gitdir="$(git rev-parse --git-dir)"
   hook="$gitdir/hooks/post-checkout"
 
@@ -43,7 +43,7 @@ function update_branch {
 # Merges a branch into your own while preserving your workspace
 function merge_branch {
   current_branch=$(git symbolic-ref --short HEAD)
-  stashed_changes=$(git stash)
+  stashed_changes=$(git stash -u)
   gitdir="$(git rev-parse --git-dir)"
   hook="$gitdir/hooks/post-checkout"
 
@@ -82,7 +82,7 @@ function merge_branch {
 # Rebases a branch into your own while preserving your workspace
 function rebase_branch {
   current_branch=$(git symbolic-ref --short HEAD)
-  stashed_changes=$(git stash)
+  stashed_changes=$(git stash -u)
   gitdir="$(git rev-parse --git-dir)"
   hook="$gitdir/hooks/post-checkout"
 
