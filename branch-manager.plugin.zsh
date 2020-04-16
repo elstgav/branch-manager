@@ -139,6 +139,7 @@ function rebase_branch {
 
 # Pull a branch, and safely delete any dead/merged branches
 function pull_and_prune {
+  original_branch=$(git symbolic-ref --short HEAD)
   stashed_changes=$(git stash -u)
 
   # Pull from master if no argument given
@@ -180,7 +181,13 @@ function pull_and_prune {
     git stash pop
   fi
 
+  # Switch back to original branch if still exists
+  git rev-parse --verify --quiet $original_branch > /dev/null
+  return_to_original_branch=$?
+  [[ $return_to_original_branch == 0 ]] && git checkout $original_branch
+
   echo "$fg[green]"
   echo "✓ Pulled from $master_branch and deleted merged branches"
+  [[ $return_to_original_branch != 0 ]] && echo "↳ Switched to $master_branch branch ($original_branch deleted)"
   echo -n "$reset_color"
 }
