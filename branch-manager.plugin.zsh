@@ -136,3 +136,58 @@ function rebase_branch {
   echo "✓ Succesfully rebased $current_branch onto $other_branch"
   echo "$reset_color"
 }
+
+# Pull a branch, and safely delete any dead/merged branches
+function pull_and_prune {
+  original_branch=$(git symbolic-ref --short HEAD)
+  stashed_changes=$(git stash -u)
+
+  # Pull from master if no argument given
+  [[ -z "$1" ]] && master_branch="master" || master_branch=$1
+
+  # Update the requested branch
+  echo -n "$fg[blue]"
+  echo "Updating $master_branch…"
+  echo "$reset_color"
+
+  git checkout $master_branch
+  git pull
+
+  # Prune dead branches
+  echo "$fg[blue]"
+  echo "Pruning branches…"
+  echo "$reset_color"
+
+  git fetch --prune
+
+  # Delete merged branches
+  echo "$fg[blue]"
+  echo "Deleting merged branches…"
+  echo "$reset_color"
+
+  for mergedBranch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match 'master|$master_branch')
+  do
+    echo -n "$fg[red]"
+    echo -n "✗ "
+    git branch -d ${mergedBranch}
+    echo -n "$reset_color"
+  done
+
+  # Reset working directory
+  if [ "$stashed_changes" != "No local changes to save" ]; then
+    echo "$fg[blue]"
+    echo "Restoring stashed changes…"
+    echo "$reset_color"
+    git stash pop
+  fi
+
+  # Switch back to original branch if still exists
+  git rev-parse --verify --quiet $original_branch > /dev/null
+  return_to_original_branch=$?
+  [[ $return_to_original_branch == 0 ]] && git checkout $original_branch
+
+  echo "$fg[green]"
+  echo "✓ Pulled from $master_branch and deleted merged branches"
+  [[ $return_to_original_branch != 0 ]] && echo "↳ Switched to $master_branch branch ($original_branch deleted)"
+  echo -n "$reset_color"
+}

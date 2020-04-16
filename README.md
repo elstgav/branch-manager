@@ -8,13 +8,18 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 `branch-manager` adds the following commands to your shell:
 
  - `update_branch [branch=current_branch]`  
-   Pull `branch` and return to your workspace
+   Pull `branch` and return to your workspace  
+   *You can also use this to update other branches while staying in your own*
     
- - `merge_branch [other_branch=master]`  
-   Merge `other_branch` into your own
+ - `merge_branch [branch=master]`  
+   Merge `branch` into your own
    
- - `rebase_branch [other_branch=master]`  
-   Rebase `other_branch` into your own
+ - `rebase_branch [branch=master]`  
+   Rebase `branch` into your own
+
+ - `pull_and_prune [branch=master]`  
+   Pull `branch` and delete all dead/merged branches.  
+   *Useful for staying up-to-date with an active remote, while keeping your local repo tidy*
 
 ## Installation
 
@@ -30,6 +35,10 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 
 
 ## Changelog
+
+#### [Unreleased]
+
+- Add `pull_and_prune` command
 
 #### 1.2.1 April 14, 2020
 
