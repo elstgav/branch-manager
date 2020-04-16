@@ -36,7 +36,7 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 
 ## Changelog
 
-#### [Unreleased]
+#### 1.3 April 16, 2020
 
 - Add `pull_and_prune` command
 
