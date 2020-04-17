@@ -167,7 +167,7 @@ function pull_and_prune {
 
   for mergedBranch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match 'master|$master_branch')
   do
-    echo -n "$fg[red]"
+    echo -n "$fg[yellow]"
     echo -n "✗ "
     git branch -d ${mergedBranch}
     echo -n "$reset_color"

@@ -36,6 +36,11 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 
 ## Changelog
 
+#### 1.3.1 April 17, 2020
+
+- Change `pull_and_prune` branch deletion message color  
+  *Changed from red (danger) to yellow (warning), since branch deletion is expected behavior.*
+
 #### 1.3 April 16, 2020
 
 - Add `pull_and_prune` command
