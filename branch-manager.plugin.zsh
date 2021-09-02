@@ -90,6 +90,7 @@ function merge_branch {
   echo "$reset_color"
 }
 
+
 # Rebases a branch into your own while preserving your workspace
 function rebase_branch {
   current_branch=$(git symbolic-ref --short HEAD)
@@ -136,6 +137,7 @@ function rebase_branch {
   echo "✓ Succesfully rebased $current_branch onto $other_branch"
   echo "$reset_color"
 }
+
 
 # Pull a branch, and safely delete any dead/merged branches
 function pull_and_prune {
