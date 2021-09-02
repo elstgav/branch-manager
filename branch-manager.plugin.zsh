@@ -191,3 +191,21 @@ function pull_and_prune {
   [[ $return_to_original_branch != 0 ]] && echo "↳ Switched to $master_branch branch ($original_branch deleted)"
   echo -n "$reset_color"
 }
+
+# Copied from git-flow plugin
+# See https://github.com/ohmyzsh/ohmyzsh/blob/21b385e7bd522983642b52b51db5d4a210a77717/plugins/git-flow/git-flow.plugin.zsh#L351-L359
+_branch-manager-git-branch-names () {
+  local expl
+  declare -a branch_names
+
+  branch_names=(${${(f)"$(_call_program branchrefs git for-each-ref --format='"%(refname)"' refs/heads 2>/dev/null)"}#refs/heads/})
+  __git_command_successful || return
+
+  _wanted branch-names expl branch-name compadd $* - $branch_names
+}
+
+_branch-manager () {
+  _arguments ':branch:_branch-manager-git-branch-names'
+}
+
+compdef _branch-manager update_branch merge_branch rebase_branch pull_and_prune
