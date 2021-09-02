@@ -192,6 +192,12 @@ function pull_and_prune {
   echo -n "$reset_color"
 }
 
+
+# ------------------------------------------------------------------------------
+# Auto-Completion
+# ------------------------------------------------------------------------------
+# TODO: Figure out how to properly define these in a _branch-manager #compdef file
+
 # Copied from git-flow plugin
 # See https://github.com/ohmyzsh/ohmyzsh/blob/21b385e7bd522983642b52b51db5d4a210a77717/plugins/git-flow/git-flow.plugin.zsh#L351-L359
 _branch-manager-git-branch-names () {
