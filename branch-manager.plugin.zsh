@@ -145,14 +145,14 @@ function pull_and_prune {
   stashed_changes=$(git stash -u)
 
   # Pull from master if no argument given
-  [[ -z "$1" ]] && master_branch="master" || master_branch=$1
+  [[ -z "$1" ]] && pull_branch="master" || pull_branch=$1
 
   # Update the requested branch
   echo -n "$fg[blue]"
-  echo "Updating $master_branch…"
+  echo "Updating $pull_branch…"
   echo "$reset_color"
 
-  git checkout $master_branch
+  git checkout $pull_branch
   git pull
 
   # Prune dead branches
@@ -167,7 +167,7 @@ function pull_and_prune {
   echo "Deleting merged branches…"
   echo "$reset_color"
 
-  for mergedBranch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match 'master|$master_branch')
+  for mergedBranch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match 'master|$pull_branch')
   do
     echo -n "$fg[yellow]"
     echo -n "✗ "
@@ -189,8 +189,8 @@ function pull_and_prune {
   [[ $return_to_original_branch == 0 ]] && git checkout $original_branch
 
   echo "$fg[green]"
-  echo "✓ Pulled from $master_branch and deleted merged branches"
-  [[ $return_to_original_branch != 0 ]] && echo "↳ Switched to $master_branch branch ($original_branch deleted)"
+  echo "✓ Pulled from $pull_branch and deleted merged branches"
+  [[ $return_to_original_branch != 0 ]] && echo "↳ Switched to $pull_branch branch ($original_branch deleted)"
   echo -n "$reset_color"
 }
 
