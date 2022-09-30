@@ -36,6 +36,10 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 
 ## Changelog
 
+#### 1.4 September 2, 2021
+
+- Added autocompletion of branch names
+
 #### 1.3.1 April 17, 2020
 
 - Change `pull_and_prune` branch deletion message color  
