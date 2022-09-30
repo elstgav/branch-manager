@@ -1,3 +1,15 @@
+# Determine the default branch name for a given
+_branch_manager_default_branch_name () {
+  configured_default_branch=$(git config init.defaultBranch)
+  if [[ -v configured_default_branch ]]; then
+    echo $configured_default_branch
+  elif [[ -v BRANCH_MANAGER_DEFAULT_BRANCH ]]; then
+    echo $BRANCH_MANAGER_DEFAULT_BRANCH
+  else
+    echo 'master'
+  fi
+}
+
 # Updates a branch and returns you to your workspace
 function update_branch {
   current_branch=$(git symbolic-ref --short HEAD)
@@ -51,8 +63,8 @@ function merge_branch {
   gitdir="$(git rev-parse --git-dir)"
   hook="$gitdir/hooks/post-checkout"
 
-  # Merge from master if no argument given
-  [[ -z "$1" ]] && other_branch="master" || other_branch=$1
+  # Merge from default branch (e.g. "master") if no argument given
+  [[ -z "$1" ]] && other_branch=$(_branch_manager_default_branch_name) || other_branch=$1
 
   # disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
@@ -98,8 +110,8 @@ function rebase_branch {
   gitdir="$(git rev-parse --git-dir)"
   hook="$gitdir/hooks/post-checkout"
 
-  # Rebase from master if no argument given
-  [[ -z "$1" ]] && other_branch="master" || other_branch=$1
+  # Rebase from default branch (e.g. "master") if no argument given
+  [[ -z "$1" ]] && other_branch=$(_branch_manager_default_branch_name) || other_branch=$1
 
   # disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
@@ -144,8 +156,8 @@ function pull_and_prune {
   original_branch=$(git symbolic-ref --short HEAD)
   stashed_changes=$(git stash -u)
 
-  # Pull from master if no argument given
-  [[ -z "$1" ]] && pull_branch="master" || pull_branch=$1
+  # Pull from default branch (e.g. "master") if no argument given
+  [[ -z "$1" ]] && pull_branch=$(_branch_manager_default_branch_name) || pull_branch=$1
 
   # Update the requested branch
   echo -n "$fg[blue]"
@@ -167,7 +179,7 @@ function pull_and_prune {
   echo "Deleting merged branches…"
   echo "$reset_color"
 
-  for mergedBranch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match 'master|$pull_branch')
+  for mergedBranch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match "$pull_branch")
   do
     echo -n "$fg[yellow]"
     echo -n "✗ "
