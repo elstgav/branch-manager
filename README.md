@@ -11,15 +11,32 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
    Pull `branch` and return to your workspace  
    *You can also use this to update other branches while staying in your own*
     
- - `merge_branch [branch=master]`  
+ - `merge_branch [branch=default_branch]`  
    Merge `branch` into your own
    
- - `rebase_branch [branch=master]`  
+ - `rebase_branch [branch=default_branch]`  
    Rebase `branch` into your own
 
- - `pull_and_prune [branch=master]`  
+ - `pull_and_prune [branch=default_branch]`  
    Pull `branch` and delete all dead/merged branches.  
    *Useful for staying up-to-date with an active remote, while keeping your local repo tidy*
+
+## Determining Default Branch
+
+For commands that default to the “default branch” (e.g. `master`/`main`), the default branch is determined by checking the following in order:
+
+1. `git config init.defaultBranch`
+2. `BRANCH_MANAGER_DEFAULT_BRANCH` environment variable
+3. …otherwise defaults to `master`
+
+If it’s guessing wrong, the easiest way to fix it is to set the default branch per repo:
+```sh
+git config init.defaultBranch [your_branch_name_here]
+```
+or globally:
+```sh
+git config --global init.defaultBranch [your_branch_name_here]
+```
 
 ## Installation
 
@@ -35,6 +52,10 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 
 
 ## Changelog
+
+#### 1.5 September 30, 2022
+
+- Auto-detects default branch name (see [Determining Default Branch](#determining-default-branch) above)
 
 #### 1.4 September 2, 2021
 
@@ -61,10 +82,10 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 
 #### 1.1.1 October 16, 2017
 
-- Fix warning messages if post-checkout hook doesn’t exist (#2)
+- Fix warning messages if post-checkout hook doesn’t exist ([#2](https://github.com/elstgav/branch-manager/issues/2))
 
 #### 1.1 October 16, 2017
 
-- Added a rebase_branch command (Thanks @blimmer!)
+- Added a rebase_branch command (Thanks [@blimmer!](https://github.com/blimmer))
 
 #### 1.0 February 2, 2016
