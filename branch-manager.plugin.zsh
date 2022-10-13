@@ -16,9 +16,7 @@ function update_branch {
   stashed_changes=$(git stash -u)
   gitdir="$(git rev-parse --git-dir)"
   hook="$gitdir/hooks/post-checkout"
-
-  # Update the current branch if no argument given
-  [[ -z "$1" ]] && other_branch=$current_branch || other_branch=$1
+  other_branch="${1:-$current_branch}"
 
   # disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
@@ -62,9 +60,7 @@ function merge_branch {
   stashed_changes=$(git stash -u)
   gitdir="$(git rev-parse --git-dir)"
   hook="$gitdir/hooks/post-checkout"
-
-  # Merge from default branch (e.g. "master") if no argument given
-  [[ -z "$1" ]] && other_branch=$(_branch_manager_default_branch_name) || other_branch=$1
+  other_branch="${1:-$(_branch_manager_default_branch_name)}"
 
   # disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
@@ -109,9 +105,7 @@ function rebase_branch {
   stashed_changes=$(git stash -u)
   gitdir="$(git rev-parse --git-dir)"
   hook="$gitdir/hooks/post-checkout"
-
-  # Rebase from default branch (e.g. "master") if no argument given
-  [[ -z "$1" ]] && other_branch=$(_branch_manager_default_branch_name) || other_branch=$1
+  other_branch="${1:-$(_branch_manager_default_branch_name)}"
 
   # disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
@@ -155,9 +149,7 @@ function rebase_branch {
 function pull_and_prune {
   original_branch=$(git symbolic-ref --short HEAD)
   stashed_changes=$(git stash -u)
-
-  # Pull from default branch (e.g. "master") if no argument given
-  [[ -z "$1" ]] && pull_branch=$(_branch_manager_default_branch_name) || pull_branch=$1
+  pull_branch="${1:-$(_branch_manager_default_branch_name)}"
 
   # Update the requested branch
   echo -n "$fg[blue]"
