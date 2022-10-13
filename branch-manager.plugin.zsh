@@ -1,6 +1,7 @@
-# Determine the default branch name for a given
+# Determine the default branch name for a given repo
 _branch_manager_default_branch_name () {
-  configured_default_branch=$(git config init.defaultBranch)
+  local configured_default_branch=$(git config init.defaultBranch)
+
   if [[ -v configured_default_branch ]]; then
     echo $configured_default_branch
   elif [[ -v BRANCH_MANAGER_DEFAULT_BRANCH ]]; then
@@ -12,13 +13,11 @@ _branch_manager_default_branch_name () {
 
 # Updates a branch and returns you to your workspace
 function update_branch {
-  current_branch=$(git symbolic-ref --short HEAD)
-  stashed_changes=$(git stash -u)
-  gitdir="$(git rev-parse --git-dir)"
-  hook="$gitdir/hooks/post-checkout"
-
-  # Update the current branch if no argument given
-  [[ -z "$1" ]] && other_branch=$current_branch || other_branch=$1
+  local current_branch=$(git symbolic-ref --short HEAD)
+  local stashed_changes=$(git stash -u)
+  local gitdir="$(git rev-parse --git-dir)"
+  local hook="$gitdir/hooks/post-checkout"
+  local other_branch="${1:-$current_branch}"
 
   # disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
@@ -58,13 +57,11 @@ function update_branch {
 
 # Merges a branch into your own while preserving your workspace
 function merge_branch {
-  current_branch=$(git symbolic-ref --short HEAD)
-  stashed_changes=$(git stash -u)
-  gitdir="$(git rev-parse --git-dir)"
-  hook="$gitdir/hooks/post-checkout"
-
-  # Merge from default branch (e.g. "master") if no argument given
-  [[ -z "$1" ]] && other_branch=$(_branch_manager_default_branch_name) || other_branch=$1
+  local current_branch=$(git symbolic-ref --short HEAD)
+  local stashed_changes=$(git stash -u)
+  local gitdir="$(git rev-parse --git-dir)"
+  local hook="$gitdir/hooks/post-checkout"
+  local other_branch="${1:-$(_branch_manager_default_branch_name)}"
 
   # disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
@@ -105,13 +102,11 @@ function merge_branch {
 
 # Rebases a branch into your own while preserving your workspace
 function rebase_branch {
-  current_branch=$(git symbolic-ref --short HEAD)
-  stashed_changes=$(git stash -u)
-  gitdir="$(git rev-parse --git-dir)"
-  hook="$gitdir/hooks/post-checkout"
-
-  # Rebase from default branch (e.g. "master") if no argument given
-  [[ -z "$1" ]] && other_branch=$(_branch_manager_default_branch_name) || other_branch=$1
+  local current_branch=$(git symbolic-ref --short HEAD)
+  local stashed_changes=$(git stash -u)
+  local gitdir="$(git rev-parse --git-dir)"
+  local hook="$gitdir/hooks/post-checkout"
+  local other_branch="${1:-$(_branch_manager_default_branch_name)}"
 
   # disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
@@ -153,11 +148,9 @@ function rebase_branch {
 
 # Pull a branch, and safely delete any dead/merged branches
 function pull_and_prune {
-  original_branch=$(git symbolic-ref --short HEAD)
-  stashed_changes=$(git stash -u)
-
-  # Pull from default branch (e.g. "master") if no argument given
-  [[ -z "$1" ]] && pull_branch=$(_branch_manager_default_branch_name) || pull_branch=$1
+  local original_branch=$(git symbolic-ref --short HEAD)
+  local stashed_changes=$(git stash -u)
+  local pull_branch="${1:-$(_branch_manager_default_branch_name)}"
 
   # Update the requested branch
   echo -n "$fg[blue]"
@@ -218,7 +211,7 @@ _branch-manager-git-branch-names () {
   local expl
   declare -a branch_names
 
-  branch_names=(${${(f)"$(_call_program branchrefs git for-each-ref --format='"%(refname)"' refs/heads 2>/dev/null)"}#refs/heads/})
+  local branch_names=(${${(f)"$(_call_program branchrefs git for-each-ref --format='"%(refname)"' refs/heads 2>/dev/null)"}#refs/heads/})
   __git_command_successful || return
 
   _wanted branch-names expl branch-name compadd $* - $branch_names

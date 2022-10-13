@@ -53,6 +53,10 @@ git config --global init.defaultBranch [your_branch_name_here]
 
 ## Changelog
 
+#### 1.6 October 12, 2022
+
+- Fix global namespace pollution by using local variables
+
 #### 1.5 September 30, 2022
 
 - Auto-detects default branch name (see [Determining Default Branch](#determining-default-branch) above)
