@@ -53,6 +53,10 @@ git config --global init.defaultBranch [your_branch_name_here]
 
 ## Changelog
 
+#### 1.7 April 12, 2024
+
+- Update `pull_and_prune` to detect and delete squash-merged branches
+
 #### 1.6 October 12, 2022
 
 - Fix global namespace pollution by using local variables
