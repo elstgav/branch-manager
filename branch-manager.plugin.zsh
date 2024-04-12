@@ -190,9 +190,9 @@ function rebase_branch {
 # Pull and Prune
 # ==============================================================================
 #
-# Keep your local repository clean and up-to-date by pruning dead/merged
-# branches, while preserving any unstaged changes. Useful for staying up-to-date
-# with an active remote, while keeping your local repo tidy.
+# Keep your local repository clean and up-to-date by fetching and pruning
+# dead/merged branches, while preserving any unstaged changes. Useful for
+# staying up-to-date with an active remote, while keeping your local repo tidy.
 #
 # Pulls upstream changes for the default (or specified) branch, and prunes any
 # branches that are dead, merged, or squash-merged to that branch. When
@@ -217,10 +217,18 @@ function pull_and_prune {
   # Prune dead branches --------------------------------------------------------
 
   echo "$fg[blue]"
-  echo "Pruning branches…"
+  echo "Fetching and pruning branches…"
   echo "$reset_color"
 
-  git fetch --prune
+  local prune_output=$(git fetch --prune)
+
+  if [[ $prune_output != "" ]]; then
+    echo "$fg[yellow]"
+    echo "$prune_output"
+    echo "$reset_color"
+  else
+    echo "✓ Nothing to fetch or prune"
+  fi
 
   # Delete merged branches -----------------------------------------------------
 
@@ -228,13 +236,21 @@ function pull_and_prune {
   echo "Deleting merged branches…"
   echo "$reset_color"
 
+  local deleted_merged_branches=false
+
   for merged_branch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match "$pull_branch")
   do
     echo -n "$fg[yellow]"
     echo -n "✗ "
     git branch -d ${merged_branch}
     echo -n "$reset_color"
+
+    deleted_merged_branches=true
   done
+
+  if [ "$deleted_merged_branches" = false ]; then
+    echo "✓ Nothing to delete"
+  fi
 
   # Delete squash-merged branches ----------------------------------------------
   #
@@ -245,6 +261,8 @@ function pull_and_prune {
   echo "Deleting squash-merged branches…"
   echo "$reset_color"
 
+  local deleted_squashed_branches=false
+
   for squashed_branch in $(git for-each-ref refs/heads/ --format '%(refname:short)' | egrep --invert-match "$pull_branch")
   do
     local merge_base=$(git merge-base $pull_branch $squashed_branch)
@@ -253,8 +271,14 @@ function pull_and_prune {
       echo -n "✗ "
       git branch -D ${squashed_branch}
       echo -n "$reset_color"
+
+      deleted_squashed_branches=true
     fi
   done
+
+  if [ "$deleted_squashed_branches" = false ]; then
+    echo "✓ Nothing to delete"
+  fi
 
   # Reset working directory ----------------------------------------------------
 
@@ -269,12 +293,15 @@ function pull_and_prune {
 
   git rev-parse --verify --quiet $original_branch > /dev/null
   local return_to_original_branch=$?
-  [[ $return_to_original_branch == 0 ]] && git checkout $original_branch
+  if [[ $return_to_original_branch == 0 ]]; then
+    echo
+    git checkout $original_branch
+  fi
 
   # Show Confirmation ----------------------------------------------------------
 
   echo "$fg[green]"
-  echo "✓ Pulled from $pull_branch and deleted merged branches"
+  echo "✓ Pulled from $pull_branch and deleted dead/merged branches"
   [[ $return_to_original_branch != 0 ]] && echo "↳ Switched to $pull_branch branch ($original_branch deleted)"
   echo -n "$reset_color"
 }
