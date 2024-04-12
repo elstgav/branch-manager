@@ -53,17 +53,21 @@ git config --global init.defaultBranch [your_branch_name_here]
 
 ## Changelog
 
+#### 1.7 April 12, 2024
+
+- Update `pull_and_prune` to detect and delete squash-merged branches
+
 #### 1.6 October 12, 2022
 
 - Fix global namespace pollution by using local variables
 
 #### 1.5 September 30, 2022
 
-- Auto-detects default branch name (see [Determining Default Branch](#determining-default-branch) above)
+- Auto-detect default branch name (see [Determining Default Branch](#determining-default-branch) above)
 
 #### 1.4 September 2, 2021
 
-- Added autocompletion of branch names
+- Add autocompletion of branch names
 
 #### 1.3.1 April 17, 2020
 
@@ -81,15 +85,15 @@ git config --global init.defaultBranch [your_branch_name_here]
 
 #### 1.2 April 14, 2020
 
-- Auto-stashing now includes untracked files
-- Removes “no stash” feedback to reduce noise
+- Include untracked files when auto-stashing changes
+- Remove “no stash” feedback to reduce noise
 
 #### 1.1.1 October 16, 2017
 
-- Fix warning messages if post-checkout hook doesn’t exist ([#2](https://github.com/elstgav/branch-manager/issues/2))
+- Fix warning message if post-checkout hook doesn’t exist ([#2](https://github.com/elstgav/branch-manager/issues/2))
 
 #### 1.1 October 16, 2017
 
-- Added a rebase_branch command (Thanks [@blimmer!](https://github.com/blimmer))
+- Add `rebase_branch` command (Thanks [@blimmer!](https://github.com/blimmer))
 
 #### 1.0 February 2, 2016
