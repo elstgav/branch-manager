@@ -182,6 +182,24 @@ function pull_and_prune {
     echo -n "$reset_color"
   done
 
+  # Delete squash-merged branches
+  # Copied and modified from James Roeder (jmaroeder) under MIT License
+  # https://github.com/jmaroeder/plugin-git/blob/216723ef4f9e8dde399661c39c80bdf73f4076c4/functions/gbda.fish
+  echo "$fg[blue]"
+  echo "Deleting squash-merged branches…"
+  echo "$reset_color"
+
+  for squashed_branch in $(git for-each-ref refs/heads/ --format '%(refname:short)' | egrep --invert-match "$pull_branch")
+  do
+    local merge_base=$(git merge-base $pull_branch $squashed_branch)
+    if [[ $(git cherry $pull_branch $(git commit-tree $(git rev-parse $squashed_branch\^{tree}) -p $merge_base -m _)) = -* ]]; then
+      echo -n "$fg[yellow]"
+      echo -n "✗ "
+      git branch -d ${squashed_branch}
+      echo -n "$reset_color"
+    fi
+  done
+
   # Reset working directory
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
