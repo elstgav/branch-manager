@@ -268,7 +268,7 @@ function pull_and_prune {
   # Switch back to original branch if still exists -----------------------------
 
   git rev-parse --verify --quiet $original_branch > /dev/null
-  return_to_original_branch=$?
+  local return_to_original_branch=$?
   [[ $return_to_original_branch == 0 ]] && git checkout $original_branch
 
   # Show Confirmation ----------------------------------------------------------
