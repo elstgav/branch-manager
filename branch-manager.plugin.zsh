@@ -11,37 +11,46 @@ _branch_manager_default_branch_name () {
   fi
 }
 
-# Updates a branch and returns you to your workspace
+
+# ==============================================================================
+# Update Branch
+# ==============================================================================
+#
+# Pull upstream commits while preserving any unstaged changes.
+#
+# Pulls upstream changes for the current (or specified) branch and returns you
+# to your workspace with any uncommitted changes restored.
+
 function update_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
   local stashed_changes=$(git stash -u)
   local git_dir="$(git rev-parse --git-dir)"
   local hook="$git_dir/hooks/post-checkout"
-  local other_branch="${1:-$current_branch}"
+  local requested_branch="${1:-$current_branch}"
 
-  # Disable post-checkout hook temporarily
+  # Disable post-checkout hook temporarily -------------------------------------
   [ -x $hook ] && mv $hook "$hook-disabled"
 
-  # Update the requested branch
+  # Update the requested branch ------------------------------------------------
   echo -n "$fg[blue]"
-  echo "Updating $other_branch…"
+  echo "Updating $requested_branch…"
   echo "$reset_color"
 
-  git checkout $other_branch
+  git checkout $requested_branch
   git pull
 
   # If we updated the current branch, then we should run post-checkout hook
-  if [[ -e "$hook-disabled" && $other_branch == $current_branch ]]; then
+  if [[ -e "$hook-disabled" && $requested_branch == $current_branch ]]; then
     mv "$hook-disabled" $hook
   fi
 
-  # Return to current branch
+  # Return to current branch ---------------------------------------------------
   git checkout $current_branch
 
-  # Re-enable hook
+  # Re-enable hook -------------------------------------------------------------
   [ -e "$hook-disabled" ] && mv "$hook-disabled" $hook
 
-  # Reset working directory
+  # Reset working directory ----------------------------------------------------
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
     echo "Restoring stashed changes…"
@@ -49,44 +58,58 @@ function update_branch {
     git stash pop
   fi
 
+  # Show Confirmation ----------------------------------------------------------
   echo "$fg[green]"
-  echo "✓ Succesfully updated $other_branch"
+  echo "✓ Succesfully updated $requested_branch"
   echo "$reset_color"
 }
 
 
-# Merges a branch into your own while preserving your workspace
+# ==============================================================================
+# Merge Branch
+# ==============================================================================
+#
+# Merge another branch while preserving any unstaged changes.
+#
+# Merges the default (or specified) branch into the current branch and returns
+# you to your workspace with any uncommitted changes restored.
+
 function merge_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
   local stashed_changes=$(git stash -u)
   local git_dir="$(git rev-parse --git-dir)"
   local hook="$git_dir/hooks/post-checkout"
-  local other_branch="${1:-$(_branch_manager_default_branch_name)}"
+  local requested_branch="${1:-$(_branch_manager_default_branch_name)}"
 
-  # Disable post-checkout hook temporarily
+  # Disable post-checkout hook temporarily -------------------------------------
   [ -x $hook ] && mv $hook "$hook-disabled"
 
-  # Update the requested branch
+  # Update the requested branch ------------------------------------------------
+
   echo -n "$fg[blue]"
-  echo "Updating $other_branch…"
+  echo "Updating $requested_branch…"
   echo "$reset_color"
 
-  git checkout $other_branch
+  git checkout $requested_branch
   git pull
 
-  # Return to current branch
+  # Return to current branch ---------------------------------------------------
+
   git checkout $current_branch
 
-  # Re-enable hook
+  # Re-enable hook -------------------------------------------------------------
+
   [ -e "$hook-disabled" ] && mv "$hook-disabled" $hook
 
-  # Merge changes
-  echo "$fg[blue]"
-  echo "Merging $other_branch…"
-  echo "$reset_color"
-  git merge $other_branch --no-edit
+  # Merge changes --------------------------------------------------------------
 
-  # Reset working directory
+  echo "$fg[blue]"
+  echo "Merging $requested_branch…"
+  echo "$reset_color"
+  git merge $requested_branch --no-edit
+
+  # Reset working directory ----------------------------------------------------
+
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
     echo "Restoring stashed changes…"
@@ -94,46 +117,61 @@ function merge_branch {
     git stash pop
   fi
 
-  # Show Confirmation
+  # Show Confirmation ----------------------------------------------------------
+
   echo "$fg[green]"
-  echo "✓ Succesfully merged $other_branch into $current_branch"
+  echo "✓ Succesfully merged $requested_branch into $current_branch"
   echo "$reset_color"
 }
 
 
-# Rebases a branch into your own while preserving your workspace
+# ==============================================================================
+# Rebase Branch
+# ==============================================================================
+#
+# Rebase off another branch while preserving any unstaged changes.
+#
+# Rebases the current branch off of the default (or specified) branch and
+# returns you to your workspace with any uncommitted changes restored.
+
 function rebase_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
   local stashed_changes=$(git stash -u)
   local git_dir="$(git rev-parse --git-dir)"
   local hook="$git_dir/hooks/post-checkout"
-  local other_branch="${1:-$(_branch_manager_default_branch_name)}"
+  local requested_branch="${1:-$(_branch_manager_default_branch_name)}"
 
-  # disable post-checkout hook temporarily
+  # Disable post-checkout hook temporarily -------------------------------------
+
   [ -x $hook ] && mv $hook "$hook-disabled"
 
-  # Update the requested branch
+  # Update the requested branch ------------------------------------------------
+
   echo -n "$fg[blue]"
-  echo "Updating $other_branch…"
+  echo "Updating $requested_branch…"
   echo "$reset_color"
 
-  git checkout $other_branch
+  git checkout $requested_branch
   git pull
 
-  # Return to current branch
+  # Return to current branch ---------------------------------------------------
+
   git checkout $current_branch
 
-  # Re-enable hook
+  # Re-enable hook -------------------------------------------------------------
+
   [ -e "$hook-disabled" ] && mv "$hook-disabled" $hook
 
-  # Rebase changes
+  # Rebase changes -------------------------------------------------------------
+
   echo "$fg[blue]"
-  echo "Rebasing off $other_branch…"
+  echo "Rebasing off $requested_branch…"
   echo "$reset_color"
 
-  git rebase $other_branch
+  git rebase $requested_branch
 
-  # Reset working directory
+  # Reset working directory ----------------------------------------------------
+
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
     echo "Restoring stashed changes…"
@@ -141,20 +179,34 @@ function rebase_branch {
     git stash pop
   fi
 
-  # Show Confirmation
+  # Show Confirmation ----------------------------------------------------------
+
   echo "$fg[green]"
-  echo "✓ Succesfully rebased $current_branch onto $other_branch"
+  echo "✓ Succesfully rebased $current_branch onto $requested_branch"
   echo "$reset_color"
 }
 
+# ==============================================================================
+# Pull and Prune
+# ==============================================================================
+#
+# Keep your local repository clean and up-to-date by pruning dead/merged
+# branches, while preserving any unstaged changes. Useful for staying up-to-date
+# with an active remote, while keeping your local repo tidy.
+#
+# Pulls upstream changes for the default (or specified) branch, and prunes any
+# branches that are dead, merged, or squash-merged to that branch. When
+# finished, restores any uncommitted changes and returns you to:
+#   - the original branch if it still exists
+#   - the default (or specified) branch if the original branch was pruned
 
-# Pull a branch, and safely delete any dead/merged branches
 function pull_and_prune {
   local original_branch=$(git symbolic-ref --short HEAD)
   local stashed_changes=$(git stash -u)
   local pull_branch="${1:-$(_branch_manager_default_branch_name)}"
 
-  # Update the requested branch
+  # Update the requested branch ------------------------------------------------
+
   echo -n "$fg[blue]"
   echo "Updating $pull_branch…"
   echo "$reset_color"
@@ -162,14 +214,16 @@ function pull_and_prune {
   git checkout $pull_branch
   git pull
 
-  # Prune dead branches
+  # Prune dead branches --------------------------------------------------------
+
   echo "$fg[blue]"
   echo "Pruning branches…"
   echo "$reset_color"
 
   git fetch --prune
 
-  # Delete merged branches
+  # Delete merged branches -----------------------------------------------------
+
   echo "$fg[blue]"
   echo "Deleting merged branches…"
   echo "$reset_color"
@@ -182,9 +236,11 @@ function pull_and_prune {
     echo -n "$reset_color"
   done
 
-  # Delete squash-merged branches
+  # Delete squash-merged branches ----------------------------------------------
+  #
   # Copied and modified from James Roeder (jmaroeder) under MIT License
   # https://github.com/jmaroeder/plugin-git/blob/216723ef4f9e8dde399661c39c80bdf73f4076c4/functions/gbda.fish
+
   echo "$fg[blue]"
   echo "Deleting squash-merged branches…"
   echo "$reset_color"
@@ -200,7 +256,8 @@ function pull_and_prune {
     fi
   done
 
-  # Reset working directory
+  # Reset working directory ----------------------------------------------------
+
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
     echo "Restoring stashed changes…"
@@ -208,12 +265,14 @@ function pull_and_prune {
     git stash pop
   fi
 
-  # Switch back to original branch if still exists
+  # Switch back to original branch if still exists -----------------------------
+
   git rev-parse --verify --quiet $original_branch > /dev/null
   return_to_original_branch=$?
   [[ $return_to_original_branch == 0 ]] && git checkout $original_branch
 
-  # Show Confirmation
+  # Show Confirmation ----------------------------------------------------------
+
   echo "$fg[green]"
   echo "✓ Pulled from $pull_branch and deleted merged branches"
   [[ $return_to_original_branch != 0 ]] && echo "↳ Switched to $pull_branch branch ($original_branch deleted)"
@@ -221,9 +280,10 @@ function pull_and_prune {
 }
 
 
-# ------------------------------------------------------------------------------
+# ==============================================================================
 # Auto-Completion
-# ------------------------------------------------------------------------------
+# ==============================================================================
+
 # TODO: Figure out how to properly define these in a _branch-manager #compdef file
 
 # Copied from git-flow plugin
