@@ -15,11 +15,11 @@ _branch_manager_default_branch_name () {
 function update_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
   local stashed_changes=$(git stash -u)
-  local gitdir="$(git rev-parse --git-dir)"
-  local hook="$gitdir/hooks/post-checkout"
+  local git_dir="$(git rev-parse --git-dir)"
+  local hook="$git_dir/hooks/post-checkout"
   local other_branch="${1:-$current_branch}"
 
-  # disable post-checkout hook temporarily
+  # Disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
 
   # Update the requested branch
@@ -59,11 +59,11 @@ function update_branch {
 function merge_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
   local stashed_changes=$(git stash -u)
-  local gitdir="$(git rev-parse --git-dir)"
-  local hook="$gitdir/hooks/post-checkout"
+  local git_dir="$(git rev-parse --git-dir)"
+  local hook="$git_dir/hooks/post-checkout"
   local other_branch="${1:-$(_branch_manager_default_branch_name)}"
 
-  # disable post-checkout hook temporarily
+  # Disable post-checkout hook temporarily
   [ -x $hook ] && mv $hook "$hook-disabled"
 
   # Update the requested branch
@@ -94,6 +94,7 @@ function merge_branch {
     git stash pop
   fi
 
+  # Show Confirmation
   echo "$fg[green]"
   echo "✓ Succesfully merged $other_branch into $current_branch"
   echo "$reset_color"
@@ -104,8 +105,8 @@ function merge_branch {
 function rebase_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
   local stashed_changes=$(git stash -u)
-  local gitdir="$(git rev-parse --git-dir)"
-  local hook="$gitdir/hooks/post-checkout"
+  local git_dir="$(git rev-parse --git-dir)"
+  local hook="$git_dir/hooks/post-checkout"
   local other_branch="${1:-$(_branch_manager_default_branch_name)}"
 
   # disable post-checkout hook temporarily
@@ -140,6 +141,7 @@ function rebase_branch {
     git stash pop
   fi
 
+  # Show Confirmation
   echo "$fg[green]"
   echo "✓ Succesfully rebased $current_branch onto $other_branch"
   echo "$reset_color"
@@ -172,11 +174,11 @@ function pull_and_prune {
   echo "Deleting merged branches…"
   echo "$reset_color"
 
-  for mergedBranch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match "$pull_branch")
+  for merged_branch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match "$pull_branch")
   do
     echo -n "$fg[yellow]"
     echo -n "✗ "
-    git branch -d ${mergedBranch}
+    git branch -d ${merged_branch}
     echo -n "$reset_color"
   done
 
@@ -193,6 +195,7 @@ function pull_and_prune {
   return_to_original_branch=$?
   [[ $return_to_original_branch == 0 ]] && git checkout $original_branch
 
+  # Show Confirmation
   echo "$fg[green]"
   echo "✓ Pulled from $pull_branch and deleted merged branches"
   [[ $return_to_original_branch != 0 ]] && echo "↳ Switched to $pull_branch branch ($original_branch deleted)"
