@@ -330,3 +330,11 @@ _branch-manager () {
 }
 
 compdef _branch-manager update_branch merge_branch rebase_branch pull_and_prune
+
+__git_command_successful () {
+  if (( ${#pipestatus:#0} > 0 )); then
+    _message 'not a git repository'
+    return 1
+  fi
+  return 0
+}
