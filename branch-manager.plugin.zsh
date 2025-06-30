@@ -197,7 +197,10 @@ function rebase_branch {
 # Squash Branch
 # ==============================================================================
 #
-# squash_branch [base_branch|main_branch] [-m/--message=<msg>] [-f/--force]
+# squash_branch [base_branch|main_branch]
+#   [-m/--message=<msg>|"Squashed $current_branch"]
+#   [-b/--branch=<name>|"$current_branch--squashed"]
+#   [-f/--force]
 #
 # Creates a new squashed, single-commit branch with all commits diverged from
 # the base branch.
@@ -205,14 +208,19 @@ function rebase_branch {
 # If the --force flag is provided, the current branch will be squashed in place.
 #
 # Flags:
+# -b <name>, --branch=<name>: Set the name of the squashed branch
+#   (default: "$current_branch--squashed")
+#
 # -m <msg>, --message=<msg>: Set the commit message for the squashed commit
+#   (default: "Squashed $current_branch")
+#
 # -f, --force: Squash in place (do not create a new branch)
 
 function squash_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
   local stashed_changes=$(git stash -u)
   local base_branch="${1:-$(_branch_manager_default_branch_name)}"
-  local target_branch=$current_branch
+  local target_branch
   local force=false
   local default_message="Squashed $current_branch"
 
@@ -224,14 +232,18 @@ function squash_branch {
         force=true ;;
       --message=|-m=)
         message="${arg#*=}" ;;
+      --branch=|-b=)
+        target_branch="${arg#*=}" ;;
       *)
     esac
   done
 
   # Create new branch if not squashing in place --------------------------------
 
-  if [[ $force == false ]]; then
-    target_branch="${current_branch}--squashed"
+  if [[ $force == true ]]; then
+    target_branch=$current_branch
+  else
+    target_branch="${target_branch:-${current_branch}--squashed}"
 
     echo "$fg[blue]"
     echo "Creating new branch $target_branch…"
