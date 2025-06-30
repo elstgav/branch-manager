@@ -218,7 +218,6 @@ function rebase_branch {
 
 function squash_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
-  local stashed_changes=$(git stash -u)
   local base_branch="${1:-$(_branch_manager_default_branch_name)}"
   local target_branch
   local force=false
@@ -238,10 +237,33 @@ function squash_branch {
     esac
   done
 
+  # Show commit messages -------------------------------------------------------
+
+  echo "$fg[blue]"
+  echo "Commits to be squashed:"
+  echo "$reset_color"
+
+  git log --pretty=format:"$fg[yellow]- %s$reset_color" $base_branch..HEAD | cat
+  echo
+
+  # Set commit message (if not provided) ---------------------------------------
+
+  if [ -z "$message" ]; then
+    echo
+    echo -n "Enter commit message: (Default: $fg[gray]\"$default_message\"$reset_color)$reset_color: "
+    read message
+
+    [[ -z "$message" ]] && message=$default_message
+  fi
+
   # Create new branch if not squashing in place --------------------------------
 
   if [[ $force == true ]]; then
     target_branch=$current_branch
+
+    echo "$fg[blue]"
+    echo "Squashing in place on $target_branch…"
+    echo "$reset_color"
   else
     target_branch="${target_branch:-${current_branch}--squashed}"
 
@@ -252,24 +274,9 @@ function squash_branch {
     git checkout -b "$target_branch"
   fi
 
-  # Show commit messages -------------------------------------------------------
+  # Stash changes --------------------------------------------------------------
 
-  echo "$fg[blue]"
-  echo "Commits to be squashed:"
-  echo "$reset_color"
-
-  git log --pretty=format:"$fg[yellow]- %s$reset_color" $base_branch..HEAD | cat
-
-  # Set commit message (if not provided) ---------------------------------------
-
-  if [ -z "$message" ]; then
-    echo
-    echo "Default: $fg[white]$default_message$reset_color"
-    echo -n "Enter commit message: (press enter to use default): "
-    read message
-
-    [[ -z "$message" ]] && message=$default_message
-  fi
+  local stashed_changes=$(git stash -u)
 
   # Squash commits -------------------------------------------------------------
 
