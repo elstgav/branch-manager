@@ -250,7 +250,7 @@ function squash_branch {
 
   if [ -z "$message" ]; then
     echo
-    echo -n "Enter commit message: (Default: $fg[gray]\"$default_message\"$reset_color)$reset_color: "
+    echo -n "Enter commit message: $fg[cyan](Default: \"$default_message\")$reset_color: "
     read message
 
     [[ -z "$message" ]] && message=$default_message
@@ -262,13 +262,13 @@ function squash_branch {
     target_branch=$current_branch
 
     echo "$fg[blue]"
-    echo "Squashing in place on $target_branch…"
+    echo "Squashing in place on $fg[cyan]\"$target_branch\"$reset_color…"
     echo "$reset_color"
   else
     target_branch="${target_branch:-${current_branch}--squashed}"
 
     echo "$fg[blue]"
-    echo "Creating new branch $target_branch…"
+    echo "Creating new branch $fg[cyan]\"$target_branch\"$reset_color…"
     echo "$reset_color"
 
     git checkout -b "$target_branch"
