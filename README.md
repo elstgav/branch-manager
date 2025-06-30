@@ -1,4 +1,5 @@
 # branch-manager [![GitHub tag](https://img.shields.io/github/v/tag/elstgav/branch-manager?label=version&sort=semver)](#changelog)
+
 oh-my-zsh plugin for managing branches
 
 Updating branches can be a pain, especially if you have unsaved changes in your workspace. `branch-manager` makes it easier to perform updates by auto-stashing your changes before doing routine maintenance, and then returning you to your workspace.
@@ -7,19 +8,26 @@ Updating branches can be a pain, especially if you have unsaved changes in your 
 
 `branch-manager` adds the following commands to your shell:
 
- - `update_branch [branch=current_branch]`  
-   Pull `branch` and return to your workspace  
-   *You can also use this to update other branches while staying in your own*
-    
- - `merge_branch [branch=default_branch]`  
-   Merge `branch` into your own
-   
- - `rebase_branch [branch=default_branch]`  
-   Rebase `branch` into your own
+- `update_branch [branch=current_branch]`  
+  Pull `branch` and return to your workspace  
+  _You can also use this to update other branches while staying in your own_
 
- - `pull_and_prune [branch=default_branch]`  
-   Pull `branch` and delete all dead/merged branches.  
-   *Useful for staying up-to-date with an active remote, while keeping your local repo tidy*
+- `merge_branch [branch=default_branch]`  
+  Merge `branch` into your own
+- `rebase_branch [branch=default_branch]`  
+  Rebase `branch` into your own
+
+- `squash_branch [base_branch|main_branch] [-m/--message=<msg>|"Squashed $current_branch"] [-b/--branch=<name>|"$current_branch--squashed"] [-f/--force]`  
+  Squash the current branch into a single commit.  
+  _You can also use this to squash in place on the current branch by using the `--force` flag_
+
+- `reset_branch_to_origin [branch=current_branch]`  
+  Reset `branch` to the origin remote.  
+  _Reset a branch to the origin remote, while keeping your uncommitted changes_
+
+- `pull_and_prune [branch=default_branch]`  
+  Pull `branch` and delete all dead/merged branches.  
+  _Useful for staying up-to-date with an active remote, while keeping your local repo tidy_
 
 ## Determining Default Branch
 
@@ -30,10 +38,13 @@ For commands that default to the “default branch” (e.g. `master`/`main`), th
 3. …otherwise defaults to `master`
 
 If it’s guessing wrong, the easiest way to fix it is to set the default branch per repo:
+
 ```sh
 git config init.defaultBranch [your_branch_name_here]
 ```
+
 or globally:
+
 ```sh
 git config --global init.defaultBranch [your_branch_name_here]
 ```
@@ -45,13 +56,24 @@ git config --global init.defaultBranch [your_branch_name_here]
 1. `$ cd ~/.oh-my-zsh/custom/plugins` (you may have to create the folder)
 2. `$ git clone git@github.com:elstgav/branch-manager.git`
 3. In your .zshrc, add `branch-manager` to your oh-my-zsh plugins:
-   
-  ```bash 
-  plugins(rails git branch-manager)
-  ```
 
+```bash
+plugins(rails git branch-manager)
+```
 
 ## Changelog
+
+#### 1.10 June 30, 2025
+
+- Add `squash_branch` command
+
+#### 1.9 June 30, 2025
+
+- Add `reset_branch_to_origin` command
+
+#### 1.8 May 23, 2025
+
+- Fix missing method for branch auto-completion
 
 #### 1.7 April 12, 2024
 
@@ -72,7 +94,7 @@ git config --global init.defaultBranch [your_branch_name_here]
 #### 1.3.1 April 17, 2020
 
 - Change `pull_and_prune` branch deletion message color  
-  *Changed from red (danger) to yellow (warning), since branch deletion is expected behavior.*
+  _Changed from red (danger) to yellow (warning), since branch deletion is expected behavior._
 
 #### 1.3 April 16, 2020
 
