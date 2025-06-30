@@ -16,6 +16,8 @@ _branch_manager_default_branch_name () {
 # Update Branch
 # ==============================================================================
 #
+# update_branch [branch_to_update|current_branch]
+#
 # Pull upstream commits while preserving any unstaged changes.
 #
 # Pulls upstream changes for the current (or specified) branch and returns you
@@ -68,6 +70,8 @@ function update_branch {
 # ==============================================================================
 # Merge Branch
 # ==============================================================================
+#
+# merge_branch [branch_to_merge_in|main_branch]
 #
 # Merge another branch while preserving any unstaged changes.
 #
@@ -129,6 +133,8 @@ function merge_branch {
 # Rebase Branch
 # ==============================================================================
 #
+# rebase_branch [branch_to_rebase_off|main_branch]
+#
 # Rebase off another branch while preserving any unstaged changes.
 #
 # Rebases the current branch off of the default (or specified) branch and
@@ -183,6 +189,155 @@ function rebase_branch {
 
   echo "$fg[green]"
   echo "✓ Succesfully rebased $current_branch onto $requested_branch"
+  echo "$reset_color"
+}
+
+
+# ==============================================================================
+# Squash Branch
+# ==============================================================================
+#
+# squash_branch [base_branch|main_branch]
+#   [-m/--message=<msg>|"Squashed $current_branch"]
+#   [-b/--branch=<name>|"$current_branch--squashed"]
+#   [-f/--force]
+#
+# Creates a new squashed, single-commit branch with all commits diverged from
+# the base branch.
+#
+# If the --force flag is provided, the current branch will be squashed in place.
+#
+# Flags:
+# -b <name>, --branch=<name>: Set the name of the squashed branch
+#   (default: "$current_branch--squashed")
+#
+# -m <msg>, --message=<msg>: Set the commit message for the squashed commit
+#   (default: "Squashed $current_branch")
+#
+# -f, --force: Squash in place (do not create a new branch)
+
+function squash_branch {
+  local current_branch=$(git symbolic-ref --short HEAD)
+  local force=false
+  local message=""
+  local target_branch=""
+  local -a positional=()
+
+  # Parse arguments ------------------------------------------------------------
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--force)
+        force=true
+        shift
+        ;;
+      -m)
+        shift
+        message="$1"
+        shift
+        ;;
+      --message=*)
+        message="${1#*=}"
+        shift
+        ;;
+      -b)
+        shift
+        target_branch="$1"
+        shift
+        ;;
+      --branch=*)
+        target_branch="${1#*=}"
+        shift
+        ;;
+      --)
+        shift
+        positional+=("$@")
+        break
+        ;;
+      *)
+        positional+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  local base_branch="${positional[1]:-$(_branch_manager_default_branch_name)}"
+  local default_message="Squashed $current_branch"
+
+  # Show commit messages -------------------------------------------------------
+
+  echo "$fg[blue]"
+  echo -n "Commits to be squashed: "
+  echo -n "$reset_color$fg_bold[black]"
+  echo -n "(off of "
+  echo -n "$reset_color$fg[cyan]"
+  echo -n "\"$base_branch\""
+  echo -n "$reset_color$fg_bold[black]"
+  echo -n ")"
+  echo "$reset_color"
+
+  git log --reverse --pretty=format:"$fg[yellow]- %s$reset_color $fg_bold[black](%cr)$reset_color" $base_branch..HEAD | cat
+  echo
+
+  # Set commit message (if not provided) ---------------------------------------
+
+  if [ -z "$message" ]; then
+    echo
+    echo -n "Enter commit message: $fg_bold[black](Default: "
+    echo -n "$reset_color$fg[cyan]"
+    echo -n "\"$default_message\""
+    echo -n "$reset_color$fg_bold[black])$reset_color "
+    read message
+
+    [[ -z "$message" ]] && message=$default_message
+  fi
+
+  # Create new branch if not squashing in place --------------------------------
+
+  if [[ $force == true ]]; then
+    target_branch=$current_branch
+
+    echo "$fg[blue]"
+    echo "Squashing in place on $fg[cyan]\"$target_branch\"$reset_color…"
+    echo "$reset_color"
+  else
+    target_branch="${target_branch:-${current_branch}--squashed}"
+
+    echo "$fg[blue]"
+    echo "Creating new branch $fg[cyan]\"$target_branch\"$reset_color…"
+    echo "$reset_color"
+
+    git checkout -b "$target_branch"
+  fi
+
+  # Stash changes --------------------------------------------------------------
+
+  local stashed_changes=$(git stash -u)
+
+  # Squash commits -------------------------------------------------------------
+
+  echo "$fg[blue]"
+  echo "Squashing commits…"
+  echo "$reset_color"
+
+  git reset --soft HEAD~$(git rev-list --count HEAD ^$base_branch) && git commit -m "$message"
+
+  # Reset working directory ----------------------------------------------------
+
+  if [ "$stashed_changes" != "No local changes to save" ]; then
+    echo "$fg[blue]"
+    echo "Restoring stashed changes…"
+    echo "$reset_color"
+    git stash pop
+  fi
+
+  # Show Confirmation ----------------------------------------------------------
+
+  echo "$fg[green]"
+  if [[ $force == true ]]; then
+    echo "✓ Succesfully squashed $current_branch"
+  else
+    echo "✓ Succesfully squashed $current_branch into $target_branch"
+  fi
   echo "$reset_color"
 }
 
