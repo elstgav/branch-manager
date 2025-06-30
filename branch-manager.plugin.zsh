@@ -243,14 +243,14 @@ function squash_branch {
   echo "Commits to be squashed:"
   echo "$reset_color"
 
-  git log --pretty=format:"$fg[yellow]- %s$reset_color" $base_branch..HEAD | cat
+  git log --reverse --pretty=format:"$fg[yellow]- %s$reset_color $fg_bold[black](%cr)$reset_color" $base_branch..HEAD | cat
   echo
 
   # Set commit message (if not provided) ---------------------------------------
 
   if [ -z "$message" ]; then
     echo
-    echo -n "Enter commit message: $fg[cyan](Default: \"$default_message\")$reset_color: "
+    echo -n "Enter commit message: $fg_bold[black](Default: \"$default_message\")$reset_color: "
     read message
 
     [[ -z "$message" ]] && message=$default_message
