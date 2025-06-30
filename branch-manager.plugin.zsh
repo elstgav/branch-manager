@@ -16,6 +16,8 @@ _branch_manager_default_branch_name () {
 # Update Branch
 # ==============================================================================
 #
+# update_branch [branch_to_update|current_branch]
+#
 # Pull upstream commits while preserving any unstaged changes.
 #
 # Pulls upstream changes for the current (or specified) branch and returns you
@@ -68,6 +70,8 @@ function update_branch {
 # ==============================================================================
 # Merge Branch
 # ==============================================================================
+#
+# merge_branch [branch_to_merge_in|main_branch]
 #
 # Merge another branch while preserving any unstaged changes.
 #
@@ -128,6 +132,8 @@ function merge_branch {
 # ==============================================================================
 # Rebase Branch
 # ==============================================================================
+#
+# rebase_branch [branch_to_rebase_off|main_branch]
 #
 # Rebase off another branch while preserving any unstaged changes.
 #
@@ -191,18 +197,16 @@ function rebase_branch {
 # Squash Branch
 # ==============================================================================
 #
-# Squash the current branch into a single commit.
+# squash_branch [base_branch|main_branch] [-m/--message=<msg>] [-f/--force]
 #
-# Squashes all commits diverged from the default (or specified) branch into a
-# single commit, while preserving any uncommitted changes.
+# Creates a new squashed, single-commit branch with all commits diverged from
+# the base branch.
+#
+# If the --force flag is provided, the current branch will be squashed in place.
 #
 # Flags:
 # -m <msg>, --message=<msg>: Set the commit message for the squashed commit
 # -f, --force: Squash in place (do not create a new branch)
-#
-# Examples:
-#   squash_branch my-branch -m "Squashed $current_branch"
-#   squash_branch my-branch -f
 
 function squash_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
@@ -233,7 +237,6 @@ function squash_branch {
     echo "Creating new branch $target_branch…"
     echo "$reset_color"
 
-    # Delete branch if it already exists locally to avoid errors
     git checkout -b "$target_branch"
   fi
 
@@ -243,13 +246,13 @@ function squash_branch {
   echo "Commits to be squashed:"
   echo "$reset_color"
 
-  git log --pretty=format:"  %s" $base_branch..HEAD | cat
+  git log --pretty=format:"$fg[yellow]- %s$reset_color" $base_branch..HEAD | cat
 
   # Set commit message (if not provided) ---------------------------------------
 
   if [ -z "$message" ]; then
     echo
-    echo "Default: $fg[black]$default_message$reset_color"
+    echo "Default: $fg[white]$default_message$reset_color"
     echo -n "Enter commit message: (press enter to use default): "
     read message
 
