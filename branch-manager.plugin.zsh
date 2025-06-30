@@ -218,24 +218,50 @@ function rebase_branch {
 
 function squash_branch {
   local current_branch=$(git symbolic-ref --short HEAD)
-  local base_branch="${1:-$(_branch_manager_default_branch_name)}"
-  local target_branch
   local force=false
-  local default_message="Squashed $current_branch"
+  local message=""
+  local target_branch=""
+  local -a positional=()
 
   # Parse arguments ------------------------------------------------------------
-
-  for arg in "$@"; do
-    case $arg in
-      --force|-f)
-        force=true ;;
-      --message=|-m=)
-        message="${arg#*=}" ;;
-      --branch=|-b=)
-        target_branch="${arg#*=}" ;;
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--force)
+        force=true
+        shift
+        ;;
+      -m)
+        shift
+        message="$1"
+        shift
+        ;;
+      --message=*)
+        message="${1#*=}"
+        shift
+        ;;
+      -b)
+        shift
+        target_branch="$1"
+        shift
+        ;;
+      --branch=*)
+        target_branch="${1#*=}"
+        shift
+        ;;
+      --)
+        shift
+        positional+=("$@")
+        break
+        ;;
       *)
+        positional+=("$1")
+        shift
+        ;;
     esac
   done
+
+  local base_branch="${positional[1]:-$(_branch_manager_default_branch_name)}"
+  local default_message="Squashed $current_branch"
 
   # Show commit messages -------------------------------------------------------
 
