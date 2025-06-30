@@ -186,6 +186,79 @@ function rebase_branch {
   echo "$reset_color"
 }
 
+
+# ==============================================================================
+# Reset Branch to Origin
+# ==============================================================================
+#
+# Reset the current branch to the origin.
+#
+# Resets the current branch to the origin and returns you to your workspace with
+# any uncommitted changes restored.
+
+function reset_branch_to_origin {
+  local current_branch=$(git symbolic-ref --short HEAD)
+  local stashed_changes=$(git stash -u)
+  local git_dir="$(git rev-parse --git-dir)"
+  local hook="$git_dir/hooks/post-checkout"
+  local requested_branch="${1:-$current_branch}"
+
+  # Ask for confirmation --------------------------------------------------------
+
+  echo -n "$fg[yellow]"
+  echo "Are you sure you want to reset $current_branch to origin/$current_branch?"
+  echo "This will discard any changes not on origin/$current_branch."
+  echo "$reset_color"
+  read -q "REPLY?Continue? (y/n): "
+  echo
+  echo
+
+  if [[ $REPLY != "y" ]]; then
+    echo -n "$fg[yellow]"
+    echo "Aborting…"
+    echo "$reset_color"
+    return
+  fi
+
+  # Disable post-checkout hook temporarily -------------------------------------
+
+  [ -x $hook ] && mv $hook "$hook-disabled"
+
+  # Reset the current branch to the origin -------------------------------------
+
+  echo -n "$fg[blue]"
+  echo "Resetting $current_branch to origin/$current_branch…"
+  echo "$reset_color"
+
+  git checkout $current_branch
+  git fetch origin $current_branch
+  git reset --hard origin/$current_branch
+
+  # Return to current branch ---------------------------------------------------
+
+  git checkout $current_branch
+
+  # Re-enable hook -------------------------------------------------------------
+
+  [ -e "$hook-disabled" ] && mv "$hook-disabled" $hook
+
+  # Reset working directory ----------------------------------------------------
+
+  if [ "$stashed_changes" != "No local changes to save" ]; then
+    echo "$fg[blue]"
+    echo "Restoring stashed changes…"
+    echo "$reset_color"
+    git stash pop
+  fi
+
+  # Show Confirmation ----------------------------------------------------------
+
+  echo "$fg[green]"
+  echo "✓ Succesfully reset $current_branch to origin/$current_branch"
+  echo "$reset_color"
+}
+
+
 # ==============================================================================
 # Pull and Prune
 # ==============================================================================
