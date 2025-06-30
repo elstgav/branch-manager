@@ -188,6 +188,104 @@ function rebase_branch {
 
 
 # ==============================================================================
+# Squash Branch
+# ==============================================================================
+#
+# Squash the current branch into a single commit.
+#
+# Squashes all commits diverged from the default (or specified) branch into a
+# single commit, while preserving any uncommitted changes.
+#
+# Flags:
+# -m <msg>, --message=<msg>: Set the commit message for the squashed commit
+# -f, --force: Squash in place (do not create a new branch)
+#
+# Examples:
+#   squash_branch my-branch -m "Squashed $current_branch"
+#   squash_branch my-branch -f
+
+function squash_branch {
+  local current_branch=$(git symbolic-ref --short HEAD)
+  local stashed_changes=$(git stash -u)
+  local base_branch="${1:-$(_branch_manager_default_branch_name)}"
+  local target_branch=$current_branch
+  local force=false
+  local default_message="Squashed $current_branch"
+
+  # Parse arguments ------------------------------------------------------------
+
+  for arg in "$@"; do
+    case $arg in
+      --force|-f)
+        force=true ;;
+      --message=|-m=)
+        message="${arg#*=}" ;;
+      *)
+    esac
+  done
+
+  # Create new branch if not squashing in place --------------------------------
+
+  if [[ $force == false ]]; then
+    target_branch="${current_branch}--squashed"
+
+    echo "$fg[blue]"
+    echo "Creating new branch $target_branch…"
+    echo "$reset_color"
+
+    # Delete branch if it already exists locally to avoid errors
+    git checkout -b "$target_branch"
+  fi
+
+  # Show commit messages -------------------------------------------------------
+
+  echo "$fg[blue]"
+  echo "Commits to be squashed:"
+  echo "$reset_color"
+
+  git log --pretty=format:"  %s" $base_branch..HEAD | cat
+
+  # Set commit message (if not provided) ---------------------------------------
+
+  if [ -z "$message" ]; then
+    echo
+    echo "Default: $fg[black]$default_message$reset_color"
+    echo -n "Enter commit message: (press enter to use default): "
+    read message
+
+    [[ -z "$message" ]] && message=$default_message
+  fi
+
+  # Squash commits -------------------------------------------------------------
+
+  echo "$fg[blue]"
+  echo "Squashing commits…"
+  echo "$reset_color"
+
+  git reset --soft HEAD~$(git rev-list --count HEAD ^$base_branch) && git commit -m "$message"
+
+  # Reset working directory ----------------------------------------------------
+
+  if [ "$stashed_changes" != "No local changes to save" ]; then
+    echo "$fg[blue]"
+    echo "Restoring stashed changes…"
+    echo "$reset_color"
+    git stash pop
+  fi
+
+  # Show Confirmation ----------------------------------------------------------
+
+  echo "$fg[green]"
+  if [[ $force == true ]]; then
+    echo "✓ Succesfully squashed $current_branch"
+  else
+    echo "✓ Succesfully squashed $current_branch into $target_branch"
+  fi
+  echo "$reset_color"
+}
+
+
+# ==============================================================================
 # Reset Branch to Origin
 # ==============================================================================
 #
