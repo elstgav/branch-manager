@@ -266,7 +266,13 @@ function squash_branch {
   # Show commit messages -------------------------------------------------------
 
   echo "$fg[blue]"
-  echo "Commits to be squashed:"
+  echo -n "Commits to be squashed: "
+  echo -n "$reset_color$fg_bold[black]"
+  echo -n "(off of "
+  echo -n "$reset_color$fg[cyan]"
+  echo -n "\"$base_branch\""
+  echo -n "$reset_color$fg_bold[black]"
+  echo -n ")"
   echo "$reset_color"
 
   git log --reverse --pretty=format:"$fg[yellow]- %s$reset_color $fg_bold[black](%cr)$reset_color" $base_branch..HEAD | cat
@@ -276,7 +282,10 @@ function squash_branch {
 
   if [ -z "$message" ]; then
     echo
-    echo -n "Enter commit message: $fg_bold[black](Default: \"$default_message\")$reset_color: "
+    echo -n "Enter commit message: $fg_bold[black](Default: "
+    echo -n "$reset_color$fg[cyan]"
+    echo -n "\"$default_message\""
+    echo -n "$reset_color$fg_bold[black])$reset_color "
     read message
 
     [[ -z "$message" ]] && message=$default_message
