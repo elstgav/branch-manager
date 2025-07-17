@@ -228,6 +228,7 @@ function squash_branch {
     case "$1" in
       -f|--force)
         force=true
+        target_branch=$current_branch
         shift
         ;;
       -m)
@@ -260,6 +261,7 @@ function squash_branch {
     esac
   done
 
+  target_branch="${target_branch:-${current_branch}--squashed}"
   local base_branch="${positional[1]:-$(_branch_manager_default_branch_name)}"
   local default_message="Squashed $current_branch"
 
@@ -268,12 +270,20 @@ function squash_branch {
   echo "$fg[blue]"
   echo -n "Commits to be squashed: "
   echo -n "$reset_color$fg_bold[black]"
-  echo -n "(off of "
+  echo -n "("
+  if [[ $force == true ]]; then
+    echo -n "overwriting $reset_color$fg[cyan]target_branch"
+  else
+    echo -n "into $reset_color$fg[cyan]$target_branch"
+  fi
+  echo -n "$reset_color$fg_bold[black]"
+  echo -n " off of "
   echo -n "$reset_color$fg[cyan]"
-  echo -n "\"$base_branch\""
+  echo -n "$base_branch"
   echo -n "$reset_color$fg_bold[black]"
   echo -n ")"
   echo "$reset_color"
+  echo
 
   git log --reverse --pretty=format:"$fg[yellow]- %s$reset_color $fg_bold[black](%cr)$reset_color" $base_branch..HEAD | cat
   echo
@@ -293,17 +303,9 @@ function squash_branch {
 
   # Create new branch if not squashing in place --------------------------------
 
-  if [[ $force == true ]]; then
-    target_branch=$current_branch
-
+  if [[ $force == false ]]; then
     echo "$fg[blue]"
-    echo "Squashing in place on $fg[cyan]\"$target_branch\"$reset_color…"
-    echo "$reset_color"
-  else
-    target_branch="${target_branch:-${current_branch}--squashed}"
-
-    echo "$fg[blue]"
-    echo "Creating new branch $fg[cyan]\"$target_branch\"$reset_color…"
+    echo "Creating new branch $fg[cyan]$target_branch$fg[blue]…"
     echo "$reset_color"
 
     git checkout -b "$target_branch"
@@ -334,9 +336,9 @@ function squash_branch {
 
   echo "$fg[green]"
   if [[ $force == true ]]; then
-    echo "✓ Succesfully squashed $current_branch"
+    echo "✓ Succesfully squashed $reset_color$fg[cyan]$current_branch"
   else
-    echo "✓ Succesfully squashed $current_branch into $target_branch"
+    echo "✓ Succesfully squashed $reset_color$fg[cyan]$current_branch$reset_color$fg[green] into $reset_color$fg[cyan]$target_branch"
   fi
   echo "$reset_color"
 }

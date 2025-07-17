@@ -63,6 +63,10 @@ plugins(rails git branch-manager)
 
 ## Changelog
 
+#### 1.11 July 16, 2025
+
+- Improve `squash_branch` output; make it more explicit if new branch is created
+
 #### 1.10 June 30, 2025
 
 - Add `squash_branch` command
