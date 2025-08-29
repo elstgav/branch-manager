@@ -52,7 +52,8 @@ function update_branch {
   # Re-enable hook -------------------------------------------------------------
   [ -e "$hook-disabled" ] && mv "$hook-disabled" $hook
 
-  # Reset working directory ----------------------------------------------------
+  # Restore working directory ----------------------------------------------------
+
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
     echo "Restoring stashed changes…"
@@ -112,7 +113,7 @@ function merge_branch {
   echo "$reset_color"
   git merge $requested_branch --no-edit
 
-  # Reset working directory ----------------------------------------------------
+  # Restore working directory ----------------------------------------------------
 
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
@@ -176,7 +177,7 @@ function rebase_branch {
 
   git rebase $requested_branch
 
-  # Reset working directory ----------------------------------------------------
+  # Restore working directory ----------------------------------------------------
 
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
@@ -323,7 +324,7 @@ function squash_branch {
 
   git reset --soft HEAD~$(git rev-list --count HEAD ^$base_branch) && git commit -m "$message"
 
-  # Reset working directory ----------------------------------------------------
+  # Restore working directory ----------------------------------------------------
 
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
@@ -399,7 +400,7 @@ function reset_branch_to_origin {
 
   [ -e "$hook-disabled" ] && mv "$hook-disabled" $hook
 
-  # Reset working directory ----------------------------------------------------
+  # Restore working directory ----------------------------------------------------
 
   if [ "$stashed_changes" != "No local changes to save" ]; then
     echo "$fg[blue]"
@@ -510,15 +511,6 @@ function pull_and_prune {
     echo "✓ Nothing to delete"
   fi
 
-  # Reset working directory ----------------------------------------------------
-
-  if [ "$stashed_changes" != "No local changes to save" ]; then
-    echo "$fg[blue]"
-    echo "Restoring stashed changes…"
-    echo "$reset_color"
-    git stash pop
-  fi
-
   # Switch back to original branch if still exists -----------------------------
 
   git rev-parse --verify --quiet $original_branch > /dev/null
@@ -526,6 +518,15 @@ function pull_and_prune {
   if [[ $return_to_original_branch == 0 ]]; then
     echo
     git checkout $original_branch
+  fi
+
+  # Restore working directory ----------------------------------------------------
+
+  if [ "$stashed_changes" != "No local changes to save" ]; then
+    echo "$fg[blue]"
+    echo "Restoring stashed changes…"
+    echo "$reset_color"
+    git stash pop
   fi
 
   # Show Confirmation ----------------------------------------------------------

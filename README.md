@@ -63,6 +63,10 @@ plugins(rails git branch-manager)
 
 ## Changelog
 
+#### 1.12 August 29, 2025
+
+- Fix `pull_and_prune` to restore stash _after_ returning to original branch
+
 #### 1.11 July 16, 2025
 
 - Improve `squash_branch` output; make it more explicit if new branch is created
