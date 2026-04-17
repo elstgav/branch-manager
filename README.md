@@ -63,6 +63,10 @@ plugins(rails git branch-manager)
 
 ## Changelog
 
+#### 1.13 April 17, 2026
+
+- Switch `squashed` suffix to prefix in `squash_branch` command (e.g. `squashed--my-branch` instead of `my-branch--squashed`). Intended to make CLI lookup easier.
+
 #### 1.12 August 29, 2025
 
 - Fix `pull_and_prune` to restore stash _after_ returning to original branch

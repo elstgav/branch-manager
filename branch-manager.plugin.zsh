@@ -200,7 +200,7 @@ function rebase_branch {
 #
 # squash_branch [base_branch|main_branch]
 #   [-m/--message=<msg>|"Squashed $current_branch"]
-#   [-b/--branch=<name>|"$current_branch--squashed"]
+#   [-b/--branch=<name>|"squashed--$current_branch"]
 #   [-f/--force]
 #
 # Creates a new squashed, single-commit branch with all commits diverged from
@@ -210,7 +210,7 @@ function rebase_branch {
 #
 # Flags:
 # -b <name>, --branch=<name>: Set the name of the squashed branch
-#   (default: "$current_branch--squashed")
+#   (default: squashed--"$current_branch")
 #
 # -m <msg>, --message=<msg>: Set the commit message for the squashed commit
 #   (default: "Squashed $current_branch")
@@ -262,7 +262,7 @@ function squash_branch {
     esac
   done
 
-  target_branch="${target_branch:-${current_branch}--squashed}"
+  target_branch="${target_branch:-squashed--${current_branch}}"
   local base_branch="${positional[1]:-$(_branch_manager_default_branch_name)}"
   local default_message="Squashed $current_branch"
 
