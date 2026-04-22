@@ -1,5 +1,10 @@
 # Changelog
 
+### `1.14.0` April 22, 2026
+
+- Switch `squash_branch` default prefix from `squashed--` to `squashed/`
+- Add support for `BRANCH_MANAGER_SQUASHED_BRANCH_PREFIX` and `BRANCH_MANAGER_SQUASHED_BRANCH_SUFFIX` environment variables to customize the default branch naming format for the `squash_branch` command
+
 ### `1.13.0` April 17, 2026
 
 - Switch `squashed` suffix to prefix in `squash_branch` command (e.g. `squashed--my-branch` instead of `my-branch--squashed`). Intended to make CLI lookup easier.
