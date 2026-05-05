@@ -480,6 +480,7 @@ function pull_and_prune {
   echo "$reset_color"
 
   local deleted_merged_branches=false
+  local merged_branch
 
   for merged_branch in $(git for-each-ref --format '%(refname:short)' --merged HEAD refs/heads | egrep --invert-match "$pull_branch")
   do
@@ -505,6 +506,7 @@ function pull_and_prune {
   echo "$reset_color"
 
   local deleted_squashed_branches=false
+  local squashed_branch
 
   for squashed_branch in $(git for-each-ref refs/heads/ --format '%(refname:short)' | egrep --invert-match "$pull_branch")
   do

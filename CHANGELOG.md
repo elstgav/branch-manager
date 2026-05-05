@@ -1,5 +1,9 @@
 # Changelog
 
+### `1.14.1` May 5, 2026
+
+- Fix local variable scoping in `for` loops
+
 ### `1.14.0` April 22, 2026
 
 - Switch `squash_branch` default prefix from `squashed--` to `squashed/`
